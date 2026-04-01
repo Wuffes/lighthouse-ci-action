@@ -35,6 +35,11 @@
 [[ -n "$INPUT_LHCI_MIN_SCORE_PERFORMANCE" ]]   && export LHCI_MIN_SCORE_PERFORMANCE="$INPUT_LHCI_MIN_SCORE_PERFORMANCE"
 [[ -n "$INPUT_LHCI_MIN_SCORE_ACCESSIBILITY" ]] && export LHCI_MIN_SCORE_ACCESSIBILITY="$INPUT_LHCI_MIN_SCORE_ACCESSIBILITY"
 
+# Shopify Crawler Access headers (from Online Store > Preferences > Crawler access)
+[[ -n "$INPUT_CRAWLER_SIGNATURE" ]]       && export CRAWLER_SIGNATURE="$INPUT_CRAWLER_SIGNATURE"
+[[ -n "$INPUT_CRAWLER_SIGNATURE_INPUT" ]] && export CRAWLER_SIGNATURE_INPUT="$INPUT_CRAWLER_SIGNATURE_INPUT"
+[[ -n "$INPUT_CRAWLER_SIGNATURE_AGENT" ]] && export CRAWLER_SIGNATURE_AGENT="$INPUT_CRAWLER_SIGNATURE_AGENT"
+
 # Add global node bin to PATH (from the Dockerfile)
 export PATH="$PATH:$npm_config_prefix/bin"
 
@@ -236,6 +241,17 @@ query_string="?preview_theme_id=${preview_id}&_fd=0&pb=0"
 min_score_performance="${LHCI_MIN_SCORE_PERFORMANCE:-0.6}"
 min_score_accessibility="${LHCI_MIN_SCORE_ACCESSIBILITY:-0.9}"
 
+# Build extraHeaders block for lighthouserc.yml if crawler signatures are provided
+extra_headers_block=""
+if [[ -n "${CRAWLER_SIGNATURE:-}" && -n "${CRAWLER_SIGNATURE_INPUT:-}" && -n "${CRAWLER_SIGNATURE_AGENT:-}" ]]; then
+  log "Crawler Access signatures detected — injecting extra headers into Lighthouse config"
+  extra_headers_block="    settings:
+      extraHeaders:
+        Signature: \"${CRAWLER_SIGNATURE}\"
+        Signature-Input: \"${CRAWLER_SIGNATURE_INPUT}\"
+        Signature-Agent: \"${CRAWLER_SIGNATURE_AGENT}\""
+fi
+
 # Env vars for puppeteer to work with our chrome install
 # See https://pptr.dev/api/puppeteer.configuration
 # export PUPPETEER_CACHE_DIR=/root/.cache/puppeteer
@@ -256,6 +272,7 @@ ci:
         - "--disable-setuid-sandbox"
         - "--disable-dev-shm-usage"
         - "--disable-gpu"
+${extra_headers_block}
   upload:
     target: temporary-public-storage
   assert:

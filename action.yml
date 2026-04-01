@@ -49,6 +49,15 @@ inputs:
     description: 'Minimum accessibility score'
     required: false
     default: 0.9
+  crawler_signature:
+    description: 'Shopify Crawler Access Signature header value (from Online Store > Preferences > Crawler access)'
+    required: false
+  crawler_signature_input:
+    description: 'Shopify Crawler Access Signature-Input header value'
+    required: false
+  crawler_signature_agent:
+    description: 'Shopify Crawler Access Signature-Agent header value'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
