@@ -247,9 +247,9 @@ if [[ -n "${CRAWLER_SIGNATURE:-}" && -n "${CRAWLER_SIGNATURE_INPUT:-}" && -n "${
   log "Crawler Access signatures detected — injecting extra headers into Lighthouse config"
   extra_headers_block="    settings:
       extraHeaders:
-        Signature: \"${CRAWLER_SIGNATURE}\"
-        Signature-Input: \"${CRAWLER_SIGNATURE_INPUT}\"
-        Signature-Agent: \"${CRAWLER_SIGNATURE_AGENT}\""
+        Signature: '${CRAWLER_SIGNATURE}'
+        Signature-Input: '${CRAWLER_SIGNATURE_INPUT}'
+        Signature-Agent: '${CRAWLER_SIGNATURE_AGENT}'"
 fi
 
 # Env vars for puppeteer to work with our chrome install
